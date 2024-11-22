@@ -1,64 +1,56 @@
-'use client'
-import Image from "next/image";
-import React, {useRef, useEffect, useState} from "react";
+'use client';
+import React, { useRef, useState } from "react";
+import Webcam from "react-webcam";
 
 export default function Home() {
-  const videoRef = useRef(null);
-  const photoRef = useRef(null);
-  const [hasPhoto, setHasPhoto] = useState(false);
+    // Webcam reference to access webcam methods
+    const webcamRef = useRef(null);
 
-  const getVideo = () => {
-    navigator.mediaDevices.getUserMedia({
-      video: {
-        width: 1920, height:1080
-      }
-    }).then(stream => {
-      let video = videoRef.current;
-      video.srcObject = stream;
-      video.play();
-    })
-  }
+    // State to store the captured photo
+    const [imageSrc, setImageSrc] = useState(null);
 
-  const takePhoto = () => {
-    const width = 414;
-    const height = width/ (16/9);
+    // Webcam constraints
+    const videoConstraints = {
+        width: 1280,
+        height: 720,
+        facingMode: "user",
+    };
 
-    let video = videoRef.current;
-    let photo = photoRef.current;
+    // Capture photo function
+    const capture = () => {
+        if (webcamRef.current) {
+            const image = webcamRef.current.getScreenshot();
+            setImageSrc(image); // Save the captured photo
+        }
+    };
 
-    photo.width = width;
-    photo.height = height;
+    return (
+        <div className="flex flex-col items-center space-y-4">
+            {/* Webcam component */}
+            <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                width={1280}
+                height={720}
+                videoConstraints={videoConstraints}
+            />
 
-    let ctx = photo.getContext('2d');
-    ctx.drawImage(video, 0, 0, width, height);
-    setHasPhoto(true);
+            {/* Capture Button */}
+            <button
+                onClick={capture}
+                className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+            >
+                Capture Photo
+            </button>
 
-  }
-useEffect(() => {
-  getVideo();
-},[videoRef])
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-     <h1>Photo Test</h1>
-      <div className="App">
-      <div className="camera">
-        <video ref={videoRef}></video>
-        <button
-            onClick={takePhoto}
-            className="px-6 py-3 bg-blue-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 active:bg-blue-700 transition"
-        >
-          📸 Snap
-        </button>
-      </div>
-        <div className="result">
-          <canvas ref={photoRef}></canvas>
-          <button
-              onClick={takePhoto}
-              className="px-6 py-3 bg-blue-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 active:bg-blue-700 transition"
-          >Close
-          </button>
+            {/* Display Captured Photo */}
+            {imageSrc && (
+                <div className="mt-4">
+                    <h2 className="text-lg font-semibold">Captured Photo:</h2>
+                    <img src={imageSrc} alt="Captured" className="mt-2 rounded-md shadow-lg" />
+                </div>
+            )}
         </div>
-      </div>
-    </div>
-  );
+    );
 }
