@@ -13,7 +13,7 @@ export default function Home() {
     const videoConstraints = {
         width: 1280,
         height: 720,
-        facingMode: "environment",
+        facingMode: "user",
     };
 
     // Capture photo function
@@ -26,15 +26,17 @@ export default function Home() {
 
     return (
         <div className="flex flex-col items-center space-y-4">
-            {/* Webcam component */}
-            <Webcam
-                audio={false}
-                ref={webcamRef}
-                screenshotFormat="image/jpeg"
-                width={1280}
-                height={720}
-                videoConstraints={videoConstraints}
-            />
+            {/* Webcam Container */}
+            <div className="relative w-full max-w-screen-md aspect-video bg-gray-800 rounded-lg overflow-hidden">
+                {/* Webcam component */}
+                <Webcam
+                    audio={false}
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                    videoConstraints={videoConstraints}
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
+            </div>
 
             {/* Capture Button */}
             <button
@@ -48,7 +50,11 @@ export default function Home() {
             {imageSrc && (
                 <div className="mt-4">
                     <h2 className="text-lg font-semibold">Captured Photo:</h2>
-                    <img src={imageSrc} alt="Captured" className="mt-2 rounded-md shadow-lg" />
+                    <img
+                        src={imageSrc}
+                        alt="Captured"
+                        className="mt-2 rounded-md shadow-lg max-w-full"
+                    />
                 </div>
             )}
         </div>
